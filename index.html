@@ -30,62 +30,50 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 	<script type="text/javascript">
 	
-	function loadFile() {
-    var url = 'data.xlsx';
-    var req = new XMLHttpRequest();
-    req.open('GET', url, true);
-    req.responseType = 'arraybuffer';
-    req.onload = function() {
-        var data = new Uint8Array(req.response);
-        var workbook = XLSX.read(data, {type: 'array'});
-        var sheetName = workbook.SheetNames[0];
-        var worksheet = workbook.Sheets[sheetName];
-        var options = [];
-        var solutions = {};
+		function loadFile() {
+			var url = 'data.xlsx';
+			var req = new XMLHttpRequest();
+			req.open('GET', url, true);
+			req.responseType = 'arraybuffer';
+			req.onload = function() {
+				var data = new Uint8Array(req.response);
+				var workbook = XLSX.read(data, {type: 'array'});
+				var sheetName = workbook.SheetNames[0];
+				var worksheet = workbook.Sheets[sheetName];
+				var options = [];
+				var solutions = {};
 
-        for (var i = 2; i < 1000; i++) {
-            var optionCell = worksheet['B' + i];
-            var solutionCell = worksheet['AU' + i];
+				for (var i = 2; i < 1000; i++) {
+					var optionCell = worksheet['B' + i];
+					var solutionCell = worksheet['AU' + i];
 
-            if (!optionCell || !optionCell.v || !solutionCell || !solutionCell.v) {
-                break;
-            }
+					if (!optionCell || !optionCell.v || !solutionCell || !solutionCell.v) {
+						break;
+					}
 
-            options.push(optionCell.v);
-            solutions[optionCell.v] = solutionCell.v;
-        }
+					options.push(optionCell.v);
+					solutions[optionCell.v] = solutionCell.v;
+				}
 
-        var dropdown = document.getElementById('dropdown');
-        dropdown.innerHTML = '<option value="">--Please choose an option--</option>';
+				var dropdown = document.getElementById('dropdown');
+				dropdown.innerHTML = '<option value="">--Please choose an option--</option>';
 
-        for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-            dropdown.innerHTML += '<option value="' + option + '">' + option + '</option>';
-        }
+				for (var i = 0; i < options.length; i++) {
+					var option = options[i];
+					dropdown.innerHTML += '<option value="' + option + '">' + option + '</option>';
+				}
 
-        dropdown.addEventListener('change', function() {
-            var option = dropdown.value;
-            var solution = solutions[option];
+				dropdown.addEventListener('change', function() {
+					var option = dropdown.value;
+					var solution = solutions[option];
 
-            if (solution) {
-                var rows = solution.split('\n');
-                var tableHtml = '<table>';
-                for (var i = 0; i < rows.length; i++) {
-                    var columns = rows[i].split(':');
-                    tableHtml += '<tr>';
-                    for (var j = 0; j < columns.length; j++) {
-                        tableHtml += '<td>' + columns[j] + '</td>';
-                    }
-                    tableHtml += '</tr>';
-                }
-                tableHtml += '</table>';
-                document.getElementById('solution').innerHTML = tableHtml;
-            }
-        });
-    };
-    req.send();
-}
-
+					if (solution) {
+						document.getElementById('solution').innerHTML = solution.replace(/([^:]+:)/, '<strong>$1</strong>');
+					}
+				});
+			};
+			req.send();
+		}
 	</script>
 </head>
 <body onload="loadFile()">
