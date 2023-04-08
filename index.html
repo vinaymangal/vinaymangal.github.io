@@ -1,4 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Website</title>
+    <style>
+      /* CSS code goes here */
+      /* Add any necessary styling for your website */
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to My Website</h1>
+    <form>
+      <label for="options">Select an option:</label>
+      <select id="options" onchange="updateSolution()">
+        <option value="">--Please select an option--</option>
+        <option value="option1">Option 1</option>
+        <option value="option2">Option 2</option>
+        <option value="option3">Option 3</option>
+      </select>
+    </form>
+    <br>
+    <div id="solution"></div>
 
-<html! >
-    my webpage on github
-</html> 
+    <script>
+      function updateSolution() {
+        var selectedOption = document.getElementById("options").value;
+        if (selectedOption) {
+          var xhr = new XMLHttpRequest();
+          xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+              document.getElementById("solution").innerHTML = xhr.responseText;
+            }
+          };
+          xhr.open("GET", selectedOption + ".html", true);
+          xhr.send();
+        } else {
+          document.getElementById("solution").innerHTML = "";
+        }
+      }
+    </script>
+  </body>
+</html>
