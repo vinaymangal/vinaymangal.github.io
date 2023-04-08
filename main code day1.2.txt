@@ -134,10 +134,10 @@
 	</script>
 </head>
 <body onload="loadFile()">
-	<p>If you want to know your Moon Nakshatra --> Check on this website <a href="https://www.prokerala.com/astrology/nakshatra-finder/">https://www.prokerala.com/astrology/nakshatra-finder/</a></p>
-	<label for="dropdown">Select an option:</label>
+	<label for="dropdown">Select your Nakshatra:</label>
 	<select id="dropdown" name="dropdown"></select><br>
-	<label for="solution">Solution:</label>
+	<label for="solution">Key traits of Nakshtra:</label>
 	<textarea readonly id="solution" name="solution" rows="50" cols="200"></textarea>
+	<p>If you want to know your Moon Nakshatra --> Check on this website <a href="https://www.prokerala.com/astrology/nakshatra-finder/">https://www.prokerala.com/astrology/nakshatra-finder/</a></p>
 </body>
 </html>
