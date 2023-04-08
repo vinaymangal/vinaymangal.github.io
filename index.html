@@ -1,66 +1,85 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>My Website</title>
-    <style>
-      /* CSS code goes here */
-      /* Add any necessary styling for your website */
-    </style>
-  </head>
-  <body>
-    <h1>Welcome to My Website</h1>
-    <form>
-      <label for="options">Select an option:</label>
-      <select id="options" onchange="updateSolution()">
-        <option value="">--Please select an option--</option>
-        <?php
-          // Replace 'data.xlsx' with the name of your Excel file
-          $filename = 'data.xlsx';
-          
-          // Replace 'Sheet1' with the name of the sheet containing the options and solutions
-          $sheetname = 'Sheet1';
-          
-          // Replace 'A' with the column letter containing the options and 'B' with the column letter containing the solutions
-          $optionsColumn = 'B';
-          $solutionsColumn = 'AU';
-          
-          // Open the Excel file and select the desired sheet
-          $excel = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-          $spreadsheet = $excel->load($filename);
-          $worksheet = $spreadsheet->getSheetByName($sheetname);
-          
-          // Loop through the rows in the columns and add options to the dropdown menu
-          foreach ($worksheet->getColumnIterator($optionsColumn) as $cell) {
-            $value = $cell->getValue();
-            $row = $cell->getRow();
-            $solutionCell = $worksheet->getCell($solutionsColumn.$row);
-            $solutionValue = $solutionCell->getValue();
-            if (!empty($value)) {
-              echo "<option value=\"$solutionValue\">$value</option>";
-            }
-          }
-        ?>
-      </select>
-    </form>
-    <br>
-    <div id="solution"></div>
+<head>
+	<title>Dropdown Demo</title>
+	<style type="text/css">
+		body {
+			font-family: Arial, sans-serif;
+			font-size: 14px;
+			margin: 20px;
+		}
+		label {
+			display: block;
+			margin-bottom: 10px;
+		}
+		select {
+			font-size: 14px;
+			padding: 5px;
+			width: 200px;
+		}
+		input[type="submit"] {
+			background-color: #007bff;
+			border: none;
+			color: #fff;
+			font-size: 14px;
+			padding: 10px;
+			margin-top: 10px;
+			cursor: pointer;
+		}
+	</style>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+	<script type="text/javascript">
+		function handleFile(e) {
+			var files = e.target.files;
+			var f = files[0];
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				var data = e.target.result;
+				var workbook = XLSX.read(data, {type: 'binary'});
+				var sheetName = workbook.SheetNames[0];
+				var worksheet = workbook.Sheets[sheetName];
+				var options = [];
+				var solutions = {};
 
-    <script>
-      function updateSolution() {
-        var selectedOption = document.getElementById("options").value;
-        if (selectedOption) {
-          var xhr = new XMLHttpRequest();
-          xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-              document.getElementById("solution").innerHTML = xhr.responseText;
-            }
-          };
-          xhr.open("GET", selectedOption + ".html", true);
-          xhr.send();
-        } else {
-          document.getElementById("solution").innerHTML = "";
-        }
-      }
-    </script>
-  </body>
+				for (var i = 2; i < 1000; i++) {
+					var optionCell = worksheet['A' + i];
+					var solutionCell = worksheet['B' + i];
+
+					if (!optionCell || !optionCell.v || !solutionCell || !solutionCell.v) {
+						break;
+					}
+
+					options.push(optionCell.v);
+					solutions[optionCell.v] = solutionCell.v;
+				}
+
+				var dropdown = document.getElementById('dropdown');
+				dropdown.innerHTML = '<option value="">--Please choose an option--</option>';
+
+				for (var i = 0; i < options.length; i++) {
+					var option = options[i];
+					dropdown.innerHTML += '<option value="' + option + '">' + option + '</option>';
+				}
+
+				dropdown.addEventListener('change', function() {
+					var option = dropdown.value;
+					var solution = solutions[option];
+
+					if (solution) {
+						document.getElementById('solution').value = solution;
+					}
+				});
+			};
+			reader.readAsBinaryString(f);
+		}
+	</script>
+</head>
+<body>
+	<label for="file">Select a file:</label>
+	<input type="file" id="file" name="file" onchange="handleFile(event)"><br>
+	<label for="dropdown">Select an option:</label>
+	<select id="dropdown" name="dropdown"></select><br>
+	<label for="solution">Solution:</label>
+	<textarea id="solution" name="solution" rows="5" cols="50"></textarea>
+</body>
 </html>
