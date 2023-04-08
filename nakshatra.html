@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Nakshatra Calculator</title>
+    <script src="https://api.opencagedata.com/api/v1/geocode.js?key=bf8e9042a5d24c7eb58e8c7940916969"></script>
+  </head>
+  <body>
+    <h1>Nakshatra Calculator</h1>
+    <form onsubmit="return calculateNakshatra()">
+      <label for="dob">Date of Birth:</label>
+      <input type="date" id="dob" name="dob" required><br>
+      <label for="time">Time of Birth:</label>
+      <input type="time" id="time" name="time" required><br>
+      <label for="place">Place of Birth:</label>
+      <input type="text" id="place" name="place" required><br>
+      <input type="submit" value="Calculate">
+    </form>
+    <div id="nakshatra"></div>
+    <script>
+      function calculateNakshatra() {
+        var dob = document.getElementById("dob").value;
+        var time = document.getElementById("time").value;
+        var place = document.getElementById("place").value;
+        var geocoder = new OpenCageGeocoder({
+          key: 'bf8e9042a5d24c7eb58e8c7940916969'
+        });
+        geocoder.geocode(place, function(result) {
+          if (result && result.length > 0) {
+            var lat = result[0].geometry.lat;
+            var lng = result[0].geometry.lng;
+            var datetime = dob + ' ' + time;
+            var request = new XMLHttpRequest();
+            var url = 'https://api.jyotish.tools/v1/nakshatra?latitude=' + lat + '&longitude=' + lng + '&datetime=' + datetime;
+            request.open('GET', url, true);
+            request.onload = function() {
+              if (request.status >= 200 && request.status < 400) {
+                var nakshatra = JSON.parse(request.responseText);
+                var nakshatraDiv = document.getElementById("nakshatra");
+                nakshatraDiv.innerHTML = "Your Nakshatra is " + nakshatra.nakshatra;
+              } else {
+                console.error("Error calculating nakshatra.");
+              }
+            };
+            request.onerror = function() {
+              console.error("Error calculating nakshatra.");
+            };
+            request.send();
+          } else {
+            console.error("Error geocoding place of birth.");
+          }
+        });
+        return false;
+      }
+    </script>
+  </body>
+</html>
