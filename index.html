@@ -15,8 +15,7 @@
 			margin: 0 auto;
 			max-width: 600px;
 			padding: 20px;
-			padding-left: 30px;
-			padding-right: 30px;
+			box-sizing: border-box;
 		}
 		h1 {
 			color: #444;
@@ -76,38 +75,13 @@
 			padding: 10px;
 			text-align: center;
 		}
-	
-		/* Media queries for smaller screens */
-		@media only screen and (max-width: 600px) {
+		@media (max-width: 600px) {
 			.container {
 				padding: 10px;
-				padding-left: 20px;
-				padding-right: 20px;
 				max-width: 100%;
-			}
-			h1 {
-				font-size: 24px;
-				margin-bottom: 10px;
-			}
-			label {
-				font-size: 16px;
-				margin-bottom: 5px;
-			}
-			select {
-				font-size: 14px;
-				padding: 8px;
-			}
-			input[type="submit"] {
-				font-size: 16px;
-				padding: 12px 24px;
-			}
-			textarea {
-				font-size: 14px;
-				height: 200px;
 			}
 		}
 	</style>
-	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 	<script type="text/javascript">
 	
