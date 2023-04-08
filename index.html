@@ -29,9 +29,6 @@
 	</style>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 	<script type="text/javascript">
-	function setSolution(solution) {
-  document.getElementById("solution").innerHTML = "<strong>" + solution.split(":")[0] + ":</strong>" + solution.split(":")[1];
-}
 	
 		function loadFile() {
 			var url = 'data.xlsx';
@@ -72,6 +69,20 @@
 
 					if (solution) {
 						document.getElementById('solution').value = solution;
+
+						if (solution) {
+						solutionText.innerHTML = '';
+						var solutionLines = solution.split('\n');
+						
+						for (var i = 0; i < solutionLines.length; i++) {
+							var line = solutionLines[i];
+							var colonIndex = line.indexOf(':');
+							if (colonIndex >= 0) {
+								var boldText = line.substring(0, colonIndex + 1);
+								var regularText = line.substring(colonIndex + 1);
+								solutionText.innerHTML += '<b>' + boldText + '</b>' + regularText + '\n';
+							} else {
+								solutionText.innerHTML += line + '\n';
 					}
 				});
 			};
