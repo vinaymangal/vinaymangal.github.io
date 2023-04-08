@@ -68,7 +68,7 @@
 					var solution = solutions[option];
 
 					if (solution) {
-						document.getElementById('solution').innerHTML = solution.replace(/(.*):/, '<strong>$1:</strong>');
+						document.getElementById('solution').innerHTML = solution.replace(/([^:]+:)/, '<strong>$1</strong>');
 					}
 				});
 			};
