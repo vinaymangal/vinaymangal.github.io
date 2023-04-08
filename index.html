@@ -29,6 +29,10 @@
 	</style>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 	<script type="text/javascript">
+	function setSolution(solution) {
+  document.getElementById("solution").innerHTML = "<strong>" + solution.split(":")[0] + ":</strong>" + solution.split(":")[1];
+}
+	
 		function loadFile() {
 			var url = 'data.xlsx';
 			var req = new XMLHttpRequest();
