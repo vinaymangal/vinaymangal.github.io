@@ -1,153 +1,143 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Vinay GITHUB Website</title>
-    <meta name="viewport" content="width=device-width, initial-scale=0.8" />
-    <link
-      href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        font-family: Arial, Helvetica, sans-serif;
-        background-color: #f5f5f5;
-      }
+<head>
+	<title>Vinay GITHUB Website</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+	<style>
+		body {
+			background-color: #f9f9f9;
+			font-family: 'Open Sans', sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+		.container {
+			margin: 10 auto;
+			max-width: 600px;
+			padding: 20px;
+			box-sizing: border-box;
+		}
+		h1 {
+			color: #444;
+			font-size: 32px;
+			margin-bottom: 20px;
+			text-align: center;
+			text-shadow: 1px 1px #fff;
+			text-transform: uppercase;
+		}
+		label {
+			display: block;
+			font-size: 18px;
+			margin-bottom: 10px;
+			color: #444;
+			font-weight: bold;
+			text-shadow: 1px 1px #fff;
+			text-transform: uppercase;
+		}
+		select {
+			background-color: #fff;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			font-size: 16px;
+			padding: 10px;
+			width: 100%;
+		}
+		input[type="submit"] {
+			background-color: #007bff;
+			border: none;
+			border-radius: 4px;
+			color: #fff;
+			cursor: pointer;
+			font-size: 18px;
+			margin-top: 20px;
+			padding: 15px 30px;
+			text-transform: uppercase;
+			transition: background-color 0.3s ease;
+		}
+		input[type="submit"]:hover {
+			background-color: #0056b3;
+		}
+		textarea {
+			background-color: #fff;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			font-size: 16px;
+			padding: 10px;
+			width: 100%;
+			height: 300px;
+			margin-top: 10px;
+		}
+		.footer {
+			background-color: #ddd;
+			border-top: 1px solid #ccc;
+			color: #444;
+			font-size: 14px;
+			padding: 10px;
+			text-align: center;
+		}
+		@media (max-width: 600px) {
+			.container {
+				padding: 10px;
+				max-width: 90%;
+			}
+		}
+	</style>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+	<script type="text/javascript">
+	
+		function loadFile() {
+			var url = 'data.xlsx';
+			var req = new XMLHttpRequest();
+			req.open('GET', url, true);
+			req.responseType = 'arraybuffer';
+			req.onload = function() {
+				var data = new Uint8Array(req.response);
+				var workbook = XLSX.read(data, {type: 'array'});
+				var sheetName = workbook.SheetNames[0];
+				var worksheet = workbook.Sheets[sheetName];
+				var options = [];
+				var solutions = {};
 
-      .container {
-        width: 80%;
-        margin: 0 auto;
-        background-color: #ffffff;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-      }
+				for (var i = 2; i < 1000; i++) {
+					var optionCell = worksheet['B' + i];
+					var solutionCell = worksheet['AU' + i];
 
-      h1 {
-        color: #3f51b5;
-        text-align: center;
-        margin-top: 0;
-      }
+					if (!optionCell || !optionCell.v || !solutionCell || !solutionCell.v) {
+						break;
+					}
 
-      form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin-top: 20px;
-      }
+					options.push(optionCell.v);
+					solutions[optionCell.v] = solutionCell.v;
+				}
 
-      label {
-        font-weight: bold;
-        margin-bottom: 10px;
-      }
+				var dropdown = document.getElementById('dropdown');
+				dropdown.innerHTML = '<option value="">--Please choose an option--</option>';
 
-      input[type="text"],
-      select {
-        padding: 10px;
-        border-radius: 5px;
-        border: none;
-        margin-bottom: 20px;
-        width: 100%;
-      }
+				for (var i = 0; i < options.length; i++) {
+					var option = options[i];
+					dropdown.innerHTML += '<option value="' + option + '">' + option + '</option>';
+				}
 
-      button {
-        background-color: #3f51b5;
-        color: #ffffff;
-        padding: 10px;
-        border-radius: 5px;
-        border: none;
-        cursor: pointer;
-        margin-top: 20px;
-        width: 100%;
-      }
+				dropdown.addEventListener('change', function() {
+					var option = dropdown.value;
+					var solution = solutions[option];
 
-      button:hover {
-        background-color: #2c3e50;
-      }
+					if (solution) {
+						document.getElementById('solution').value = solution;
 
-      .output {
-        background-color: #f1f1f1;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        margin-top: 20px;
-        width: 100%;
-        text-align: center;
-      }
-    </style>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-    <script type="text/javascript">
-      function loadFile() {
-        var url = "data.xlsx";
-        var req = new XMLHttpRequest();
-        req.open("GET", url, true);
-        req.responseType = "arraybuffer";
-        req.onload = function () {
-          var data = new Uint8Array(req.response);
-          var workbook = XLSX.read(data, { type: "array" });
-          var sheetName = workbook.SheetNames[0];
-          var worksheet = workbook.Sheets[sheetName];
-          var options = [];
-          var solutions = {};
-
-          for (var i = 2; i < 1000; i++) {
-            var optionCell = worksheet["B" + i];
-            var solutionCell = worksheet["AU" + i];
-
-            if (
-              !optionCell ||
-              !optionCell.v ||
-              !solutionCell ||
-              !solutionCell.v
-            ) {
-              break;
-            }
-
-            options.push(optionCell.v);
-            solutions[optionCell.v] = solutionCell.v;
-          }
-
-          var dropdown = document.getElementById("dropdown");
-          dropdown.innerHTML =
-            '<option value="">--Please choose an option--</option>';
-
-          for (var i = 0; i < options.length; i++) {
-            var option = options[i];
-            dropdown.innerHTML +=
-              '<option value="' + option + '">' + option + "</option>";
-          }
-
-          dropdown.addEventListener("change", function () {
-            var option = dropdown.value;
-            var solution = solutions[option];
-
-            if (solution) {
-              document.getElementById("solution").value = solution;
-            }
-          });
-        };
-        req.send();
-      }
-    </script>
-  </head>
-  <body onload="loadFile()">
-    <label for="dropdown">Select your Nakshatra:</label>
-    <select id="dropdown" name="dropdown"></select
-    ><br />
-    <label for="solution">Key traits of Nakshtra:</label>
-    <textarea
-      readonly
-      id="solution"
-      name="solution"
-      rows="50"
-      cols="150"
-    ></textarea>
-    <p>
-      If you want to know your Moon Nakshatra --> Check on this website
-      <a href="https://www.prokerala.com/astrology/nakshatra-finder/"
-        >https://www.prokerala.com/astrology/nakshatra-finder/</a
-      >
-    </p>
-  </body>
+						
+					}
+				});
+			};
+			req.send();
+		}
+	</script>
+</head>
+<body onload="loadFile()">
+	<label for="dropdown">Select your Nakshatra:</label>
+	<select id="dropdown" name="dropdown"></select><br>
+	<label for="solution">Key traits of Nakshtra:</label>
+	<textarea readonly id="solution" name="solution" rows="50" cols="200"></textarea>
+	<p>If you want to know your Moon Nakshatra --> Check on this website <a href="https://www.prokerala.com/astrology/nakshatra-finder/">https://www.prokerala.com/astrology/nakshatra-finder/</a></p>
+</body>
 </html>
