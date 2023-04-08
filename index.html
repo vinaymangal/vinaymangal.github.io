@@ -1,84 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Dropdown Demo</title>
-	<style type="text/css">
+	<title>Excel Drop-down Menu</title>
+	<meta charset="UTF-8">
+	<style>
 		body {
 			font-family: Arial, sans-serif;
-			font-size: 14px;
-			margin: 20px;
+		}
+		h1 {
+			font-size: 24px;
+			font-weight: bold;
 		}
 		label {
-			display: block;
+			display: inline-block;
 			margin-bottom: 10px;
 		}
 		select {
-			font-size: 14px;
-			padding: 5px;
-			width: 200px;
+			margin-bottom: 10px;
 		}
-		input[type="submit"] {
-			background-color: #007bff;
-			border: none;
-			color: #fff;
-			font-size: 14px;
-			padding: 10px;
-			margin-top: 10px;
-			cursor: pointer;
+		textarea {
+			width: 100%;
+			height: 150px;
+			resize: vertical;
 		}
 	</style>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-	<script type="text/javascript">
-		function loadFile() {
-			var url = 'data.xlsx';
-			var req = new XMLHttpRequest();
-			req.open('GET', url, true);
-			req.responseType = 'arraybuffer';
-			req.onload = function() {
-				var data = new Uint8Array(req.response);
-				var workbook = XLSX.read(data, {type: 'array'});
-				var sheetName = workbook.SheetNames[0];
-				var worksheet = workbook.Sheets[sheetName];
-				var options = [];
-				var solutions = {};
+</head>
+<body>
+	<h1>Excel Drop-down Menu</h1>
+	<form>
+		<label for="options">Select an option:</label>
+		<select id="options" name="options"></select>
+	</form>
+	<label for="solution">Solution:</label>
+	<textarea id="solution" readonly rows="6" cols="80"></textarea>
 
-				for (var i = 2; i < 1000; i++) {
-					var optionCell = worksheet['B' + i];
-					var solutionCell = worksheet['AU' + i];
-
-					if (!optionCell || !optionCell.v || !solutionCell || !solutionCell.v) {
-						break;
-					}
-
-					options.push(optionCell.v);
-					solutions[optionCell.v] = solutionCell.v;
+	<script>
+		function loadOptions() {
+			// Load the Excel file
+			const xhr = new XMLHttpRequest();
+			xhr.open('GET', 'data.xlsx', true);
+			xhr.responseType = 'arraybuffer';
+			xhr.onload = function(e) {
+				// Parse the Excel file
+				const arraybuffer = xhr.response;
+				const data = new Uint8Array(arraybuffer);
+				const arr = new Array();
+				for(let i = 0; i < data.length; ++i) {
+					arr[i] = String.fromCharCode(data[i]);
 				}
+				const bstr = arr.join("");
+				const workbook = XLSX.read(bstr, {type:"binary"});
 
-				var dropdown = document.getElementById('dropdown');
-				dropdown.innerHTML = '<option value="">--Please choose an option--</option>';
+				// Get the options from the Excel file
+				const sheetName = workbook.SheetNames[0];
+				const worksheet = workbook.Sheets[sheetName];
+				const options = XLSX.utils.sheet_to_json(worksheet, {header:1, range:1});
 
-				for (var i = 0; i < options.length; i++) {
-					var option = options[i];
-					dropdown.innerHTML += '<option value="' + option + '">' + option + '</option>';
-				}
+				// Populate the dropdown menu with options
+				const select = document.getElementById('options');
+				options.forEach(function(option) {
+					const optionElement = document.createElement('option');
+					optionElement.value = option[0];
+					optionElement.text = option[0];
+					select.appendChild(optionElement);
+				});
 
-				dropdown.addEventListener('change', function() {
-					var option = dropdown.value;
-					var solution = solutions[option];
+				// Set up event listener for dropdown menu
+				select.addEventListener('change', function() {
+					// Get the selected option
+					const selectedOption = this.value;
 
-					if (solution) {
+					// Find the corresponding solution in the Excel file
+					const row = options.findIndex(option => option[0] === selectedOption);
+					if (row > -1) {
+						const solution = options[row][1];
 						document.getElementById('solution').value = solution;
 					}
 				});
 			};
-			req.send();
+			xhr.send();
 		}
+
+		document.addEventListener('DOMContentLoaded', loadOptions);
 	</script>
-</head>
-<body onload="loadFile()">
-	<label for="dropdown">Select an option:</label>
-	<select id="dropdown" name="dropdown"></select><br>
-	<label for="solution">Solution:</label>
-	<textarea id="solution" name="solution" rows="5" cols="50"></textarea>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.6/xlsx.full.min.js"></script>
 </body>
 </html>
