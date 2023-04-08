@@ -13,9 +13,33 @@
       <label for="options">Select an option:</label>
       <select id="options" onchange="updateSolution()">
         <option value="">--Please select an option--</option>
-        <option value="option1">Option 1</option>
-        <option value="option2">Option 2</option>
-        <option value="option3">Option 3</option>
+        <?php
+          // Replace 'data.xlsx' with the name of your Excel file
+          $filename = 'data.xlsx';
+          
+          // Replace 'Sheet1' with the name of the sheet containing the options and solutions
+          $sheetname = 'Sheet1';
+          
+          // Replace 'A' with the column letter containing the options and 'B' with the column letter containing the solutions
+          $optionsColumn = 'B';
+          $solutionsColumn = 'AU';
+          
+          // Open the Excel file and select the desired sheet
+          $excel = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+          $spreadsheet = $excel->load($filename);
+          $worksheet = $spreadsheet->getSheetByName($sheetname);
+          
+          // Loop through the rows in the columns and add options to the dropdown menu
+          foreach ($worksheet->getColumnIterator($optionsColumn) as $cell) {
+            $value = $cell->getValue();
+            $row = $cell->getRow();
+            $solutionCell = $worksheet->getCell($solutionsColumn.$row);
+            $solutionValue = $solutionCell->getValue();
+            if (!empty($value)) {
+              echo "<option value=\"$solutionValue\">$value</option>";
+            }
+          }
+        ?>
       </select>
     </form>
     <br>
