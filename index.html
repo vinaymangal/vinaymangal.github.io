@@ -29,13 +29,14 @@
 	</style>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 	<script type="text/javascript">
-		function handleFile(e) {
-			var files = e.target.files;
-			var f = files[0];
-			var reader = new FileReader();
-			reader.onload = function(e) {
-				var data = e.target.result;
-				var workbook = XLSX.read(data, {type: 'binary'});
+		function loadFile() {
+			var url = 'data.xlsx';
+			var req = new XMLHttpRequest();
+			req.open('GET', url, true);
+			req.responseType = 'arraybuffer';
+			req.onload = function() {
+				var data = new Uint8Array(req.response);
+				var workbook = XLSX.read(data, {type: 'array'});
 				var sheetName = workbook.SheetNames[0];
 				var worksheet = workbook.Sheets[sheetName];
 				var options = [];
@@ -70,13 +71,11 @@
 					}
 				});
 			};
-			reader.readAsBinaryString(f);
+			req.send();
 		}
 	</script>
 </head>
-<body>
-	<label for="file">Select a file:</label>
-	<input type="file" id="file" name="file" onchange="handleFile(event)"><br>
+<body onload="loadFile()">
 	<label for="dropdown">Select an option:</label>
 	<select id="dropdown" name="dropdown"></select><br>
 	<label for="solution">Solution:</label>
