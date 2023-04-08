@@ -68,7 +68,24 @@
 					var solution = solutions[option];
 
 					if (solution) {
-						document.getElementById('solution').innerHTML = solution.replace(/([^:]+:)/, '<strong>$1</strong>');
+						var solutionRows = solution.split('\n');
+						var tableHtml = '<table>';
+
+						for (var i = 0; i < solutionRows.length; i++) {
+							var rowHtml = '<tr>';
+							var columns = solutionRows[i].split(':');
+
+							for (var j = 0; j < columns.length; j++) {
+								var columnHtml = '<td>' + columns[j] + '</td>';
+								rowHtml += columnHtml;
+							}
+
+							rowHtml += '</tr>';
+							tableHtml += rowHtml;
+						}
+
+						tableHtml += '</table>';
+						document.getElementById('solution').innerHTML = tableHtml;
 					}
 				});
 			};
@@ -80,6 +97,6 @@
 	<label for="dropdown">Select an option:</label>
 	<select id="dropdown" name="dropdown"></select><br>
 	<label for="solution">Solution:</label>
-	<textarea readonly id="solution" name="solution" rows="50" cols="150"></textarea>
+	<div id="solution"></div>
 </body>
 </html>
