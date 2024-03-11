@@ -8,7 +8,108 @@
       rel="stylesheet"
     />
     <style>
-      /* ... (existing styles) ... */
+      body {
+        background-color: #ffffff;
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 600px;
+        padding: 40px;
+        box-sizing: border-box;
+        text-align: center;
+      }
+      h1 {
+        color: #333;
+        font-size: 36px;
+        margin-bottom: 30px;
+      }
+      label {
+        display: block;
+        font-size: 20px;
+        margin-bottom: 15px;
+        color: #333;
+      }
+      select {
+        background-color: #f5f5f5;
+        border: none;
+        border-radius: 4px;
+        font-size: 18px;
+        padding: 12px;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      textarea {
+        background-color: #f5f5f5;
+        border: none;
+        border-radius: 4px;
+        font-size: 18px;
+        padding: 20px;
+        width: 100%;
+        height: 300px;
+        margin-top: 10px;
+        resize: none;
+      }
+      input[type="text"],
+      input[type="date"],
+      input[type="time"] {
+        background-color: #f5f5f5;
+        border: none;
+        border-radius: 4px;
+        font-size: 18px;
+        padding: 12px;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      button {
+        background-color: #4285f4;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 12px 30px;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #3367d6;
+      }
+      .footer {
+        color: #777;
+        font-size: 14px;
+        margin-top: 30px;
+      }
+      #suggestions {
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1;
+      }
+      #suggestions div {
+        padding: 5px;
+        cursor: pointer;
+      }
+      #suggestions div:hover {
+        background-color: #f2f2f2;
+      }
+      @media (max-width: 600px) {
+        .container {
+          padding: 20px;
+        }
+        h1 {
+          font-size: 28px;
+        }
+        label, select, textarea {
+          font-size: 16px;
+        }
+      }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
@@ -65,25 +166,31 @@
         req.send();
       }
 
-      function getPlaces() {
-        var url = "https://nominatim.openstreetmap.org/search?q=india&format=json&limit=50";
+      function getPlaces(query) {
+        if (query.length < 3) return;
+
+        var url = "https://secure.geonames.org/searchJSON?q=" + encodeURIComponent(query) + "&maxRows=10&username=vinaymangal";
 
         $.getJSON(url, function(data) {
-          var dropdown = $("#pob");
-          $.each(data, function(index, place) {
-            dropdown.append($("<option>").val(JSON.stringify({
-              name: place.display_name,
-              latitude: parseFloat(place.lat),
-              longitude: parseFloat(place.lon)
-            })).text(place.display_name));
+          var suggestions = $("#suggestions");
+          suggestions.empty();
+
+          $.each(data.geonames, function(index, place) {
+            var option = $("<div>").text(place.name + ", " + place.countryName).attr("data-value", JSON.stringify({
+              name: place.name + ", " + place.countryName,
+              latitude: place.lat,
+              longitude: place.lng
+            }));
+            suggestions.append(option);
           });
+
+          suggestions.show();
         });
       }
 
       function generateNakshatra() {
         var dob = document.getElementById("dob").value;
-        var pobSelect = document.getElementById("pob");
-        var selectedPlace = JSON.parse(pobSelect.value);
+        var selectedPlace = JSON.parse($("#pob").attr("data-value"));
         var tob = document.getElementById("tob").value;
 
         // Extract the day, month, and year from the date of birth
@@ -137,7 +244,17 @@
 
       $(document).ready(function() {
         loadFile();
-        getPlaces();
+        
+        $("#pob").on("input", function() {
+          var query = $(this).val();
+          getPlaces(query);
+        });
+
+        $("#suggestions").on("click", "div", function() {
+          var selectedPlace = JSON.parse($(this).attr("data-value"));
+          $("#pob").val(selectedPlace.name).attr("data-value", JSON.stringify(selectedPlace));
+          $("#suggestions").hide();
+        });
       });
     </script>
   </head>
@@ -149,9 +266,8 @@
       <label for="tob">Time of Birth:</label>
       <input type="time" id="tob" name="tob" required>
       <label for="pob">Place of Birth:</label>
-      <select id="pob" name="pob" required>
-        <option value="">Select a place</option>
-      </select>
+      <input type="text" id="pob" name="pob" required>
+      <div id="suggestions" style="display: none;"></div>
       <button onclick="generateNakshatra()">Generate Nakshatra</button>
       <label for="nakshatra">Generated Nakshatra:</label>
       <input type="text" id="nakshatra" name="nakshatra" readonly>
