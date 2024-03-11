@@ -9,6 +9,14 @@
     />
     <style>
       /* ... (existing styles) ... */
+      .input-group {
+        display: flex;
+        align-items: center;
+      }
+      .input-group input {
+        flex: 1;
+        margin-right: 10px;
+      }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
@@ -39,21 +47,20 @@
         });
       }
 
+      function selectPlace() {
+        var selectedPlace = JSON.parse($("#pob").attr("data-value"));
+        if (selectedPlace) {
+          $("#pob").val(selectedPlace.name);
+          $("#suggestions").hide();
+        }
+      }
+
       function generateNakshatra() {
         var dob = document.getElementById("dob").value;
         var selectedPlace = JSON.parse($("#pob").attr("data-value"));
         var tob = document.getElementById("tob").value;
 
-        // Extract the day, month, and year from the date of birth
-        var dobParts = dob.split("-");
-        var day = parseInt(dobParts[2]);
-        var month = parseInt(dobParts[1]);
-        var year = parseInt(dobParts[0]);
-
-        // Extract the hour and minute from the time of birth
-        var tobParts = tob.split(":");
-        var hour = parseInt(tobParts[0]);
-        var min = parseInt(tobParts[1]);
+        // ... (existing code for extracting day, month, year, hour, min) ...
 
         // Prepare the API request data
         var requestData = {
@@ -78,58 +85,3 @@
           },
           data: JSON.stringify(requestData),
           success: function(response) {
-            console.log("API Response:", response);
-            var nakshatra = response.moon_naks;
-            document.getElementById("nakshatra").value = nakshatra;
-
-            // Trigger the dropdown change event to display the corresponding solution
-            var dropdown = document.getElementById("dropdown");
-            dropdown.value = nakshatra;
-            dropdown.dispatchEvent(new Event("change"));
-          },
-          error: function(xhr, status, error) {
-            console.error("Error:", error);
-          }
-        });
-      }
-
-      $(document).ready(function() {
-        loadFile();
-        
-        $("#pob").on("input", function() {
-          var query = $(this).val();
-          getPlaces(query);
-        });
-
-        $("#suggestions").on("click", "div", function() {
-          var selectedPlace = JSON.parse($(this).attr("data-value"));
-          $("#pob").val(selectedPlace.name).attr("data-value", JSON.stringify(selectedPlace));
-          $("#suggestions").hide();
-        });
-      });
-    </script>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Nakshatra Properties</h1>
-      <label for="dob">Date of Birth:</label>
-      <input type="date" id="dob" name="dob" required>
-      <label for="tob">Time of Birth:</label>
-      <input type="time" id="tob" name="tob" required>
-      <label for="pob">Place of Birth:</label>
-      <input type="text" id="pob" name="pob" autocomplete="off" required>
-      <div id="suggestions" style="display: none;"></div>
-      <button onclick="generateNakshatra()">Generate Nakshatra</button>
-      <label for="nakshatra">Generated Nakshatra:</label>
-      <input type="text" id="nakshatra" name="nakshatra" readonly>
-      <label for="dropdown">Select your Nakshatra:</label>
-      <select id="dropdown" name="dropdown"></select>
-      <label for="solution">Key traits of Nakshatra:</label>
-      <textarea readonly id="solution" name="solution"></textarea>
-      <p class="footer">
-        If you want to know your Moon Nakshatra, check on this website:<br>
-        <a href="https://www.prokerala.com/astrology/nakshatra-finder/">https://www.prokerala.com/astrology/nakshatra-finder/</a>
-      </p>
-    </div>
-  </body>
-</html>
