@@ -55,6 +55,30 @@
         margin-top: 10px;
         resize: none;
       }
+      input[type="text"],
+      input[type="date"],
+      input[type="time"] {
+        background-color: #f5f5f5;
+        border: none;
+        border-radius: 4px;
+        font-size: 18px;
+        padding: 12px;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+      button {
+        background-color: #4285f4;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 12px 30px;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #3367d6;
+      }
       .footer {
         color: #777;
         font-size: 14px;
@@ -72,6 +96,7 @@
         }
       }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script type="text/javascript">
       function loadFile() {
@@ -125,11 +150,63 @@
         };
         req.send();
       }
+
+      function generateNakshatra() {
+        var dob = document.getElementById("dob").value;
+        var pob = document.getElementById("pob").value;
+        var tob = document.getElementById("tob").value;
+
+        // Prepare the API request data
+        var requestData = {
+          ayanamsa: 1,
+          date: dob,
+          month: "",
+          year: "",
+          hour: "",
+          min: "",
+          lat: "",
+          lon: "",
+          tzone: 5.5
+        };
+
+        // Make the API request using jQuery
+        $.ajax({
+          url: "https://api.prokerala.com/v2/astrology/nakshatra",
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + "4a583a02-899c-4594-8408-46e70118b8db",
+            "X-Api-Key": "7Tn3Y5TkvRqTxrawIJJmvXgW7ORo3j0p7KUfmVvG",
+            "Content-Type": "application/json"
+          },
+          data: JSON.stringify(requestData),
+          success: function(response) {
+            var nakshatra = response.data.nakshatra;
+            document.getElementById("nakshatra").value = nakshatra;
+
+            // Trigger the dropdown change event to display the corresponding solution
+            var dropdown = document.getElementById("dropdown");
+            dropdown.value = nakshatra;
+            dropdown.dispatchEvent(new Event("change"));
+          },
+          error: function(xhr, status, error) {
+            console.error("Error:", error);
+          }
+        });
+      }
     </script>
   </head>
   <body onload="loadFile()">
     <div class="container">
       <h1>Nakshatra Properties</h1>
+      <label for="dob">Date of Birth:</label>
+      <input type="date" id="dob" name="dob" required>
+      <label for="pob">Place of Birth:</label>
+      <input type="text" id="pob" name="pob" required>
+      <label for="tob">Time of Birth:</label>
+      <input type="time" id="tob" name="tob" required>
+      <button onclick="generateNakshatra()">Generate Nakshatra</button>
+      <label for="nakshatra">Generated Nakshatra:</label>
+      <input type="text" id="nakshatra" name="nakshatra" readonly>
       <label for="dropdown">Select your Nakshatra:</label>
       <select id="dropdown" name="dropdown"></select>
       <label for="solution">Key traits of Nakshatra:</label>
