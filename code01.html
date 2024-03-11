@@ -85,3 +85,65 @@
           },
           data: JSON.stringify(requestData),
           success: function(response) {
+            console.log("API Response:", response);
+            var nakshatra = response.moon_naks;
+            document.getElementById("nakshatra").value = nakshatra;
+
+            // Trigger the dropdown change event to display the corresponding solution
+            var dropdown = document.getElementById("dropdown");
+            dropdown.value = nakshatra;
+            dropdown.dispatchEvent(new Event("change"));
+          },
+          error: function(xhr, status, error) {
+            console.error("Error:", error);
+          }
+        });
+      }
+
+      $(document).ready(function() {
+        loadFile();
+        
+        $("#pob").on("input", function() {
+          var query = $(this).val();
+          getPlaces(query);
+        });
+
+        $("#suggestions").on("click", "div", function() {
+          var selectedPlace = JSON.parse($(this).attr("data-value"));
+          $("#pob").val(selectedPlace.name).attr("data-value", JSON.stringify(selectedPlace));
+          $("#suggestions").hide();
+        });
+
+        $("#searchPlace").on("click", function() {
+          selectPlace();
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Nakshatra Properties</h1>
+      <label for="dob">Date of Birth:</label>
+      <input type="date" id="dob" name="dob" required>
+      <label for="tob">Time of Birth:</label>
+      <input type="time" id="tob" name="tob" required>
+      <label for="pob">Place of Birth:</label>
+      <div class="input-group">
+        <input type="text" id="pob" name="pob" autocomplete="off" required>
+        <button id="searchPlace">Search</button>
+      </div>
+      <div id="suggestions" style="display: none;"></div>
+      <button onclick="generateNakshatra()">Generate Nakshatra</button>
+      <label for="nakshatra">Generated Nakshatra:</label>
+      <input type="text" id="nakshatra" name="nakshatra" readonly>
+      <label for="dropdown">Select your Nakshatra:</label>
+      <select id="dropdown" name="dropdown"></select>
+      <label for="solution">Key traits of Nakshatra:</label>
+      <textarea readonly id="solution" name="solution"></textarea>
+      <p class="footer">
+        If you want to know your Moon Nakshatra, check on this website:<br>
+        <a href="https://www.prokerala.com/astrology/nakshatra-finder/">https://www.prokerala.com/astrology/nakshatra-finder/</a>
+      </p>
+    </div>
+  </body>
+</html>
