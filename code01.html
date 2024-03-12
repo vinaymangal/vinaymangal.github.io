@@ -192,30 +192,33 @@
         });
       }
 
-      function generateNakshatra() {
-        var dob = document.getElementById("dob").value;
-        var selectedPlace = JSON.parse($("#pob").attr("data-value"));
-        var tob = document.getElementById("tob").value;
+     function generateNakshatra() {
+    var dob = document.getElementById("dob").value;
+    var selectedPlace = JSON.parse($("#pob").attr("data-value"));
+    var tob = document.getElementById("tob").value;
 
-        // Prepare the API request data
-        var requestData = {
-          ayanamsa: 1,
-          coordinates: selectedPlace.latitude + "," + selectedPlace.longitude,
-          datetime: dob + "T" + tob + ":00+05:30",
-          la: "en"
-        };
+    // Prepare the API request data
+    var requestData = {
+        ayanamsa: 1,
+        coordinates: selectedPlace.latitude + "," + selectedPlace.longitude,
+        datetime: dob + "T" + tob + ":00+05:30",
+        la: "en"
+    };
 
-        // Make the API request using jQuery
-        $.ajax({
-          url: "https://api.prokerala.com/v2/astrology/birth-details",
-          method: "POST",
-          headers: {
+    // Log the requestData object
+    console.log("Request Data:", requestData);
+
+    // Make the API request using jQuery
+    $.ajax({
+        url: "https://api.prokerala.com/v2/astrology/birth-details",
+        method: "POST",
+        headers: {
             "Authorization": "Bearer " + "a1f574be-0a88-4f02-b28e-a5c888ebbb9a",
             "X-Api-Key": "WFambIbA92FcEk5Rlq3to7LDlXPxMZNLgl5gXGuZ",
             "Content-Type": "application/json"
-          },
-          data: JSON.stringify(requestData),
-          success: function(response) {
+        },
+        data: JSON.stringify(requestData),
+        success: function(response) {
             console.log("API Response:", response);
             var nakshatra = response.nakshatra;
             var rashi = response.rashi;
@@ -228,15 +231,15 @@
             dropdown.dispatchEvent(new Event("change"));
 
             $("#apiStatus").text("Prokerala API: Success");
-          },
-          error: function(xhr, status, error) {
+        },
+        error: function(xhr, status, error) {
             console.error("Error:", error);
             console.error("Status:", status);
             console.error("Response:", xhr.responseText);
             $("#apiStatus").text("Prokerala API: Failure");
-          }
-        });
-      }
+        }
+    });
+}
 
       $(document).ready(function() {
         loadFile();
