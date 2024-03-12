@@ -193,52 +193,52 @@
       }
 
      function generateNakshatra() {
-    var dob = document.getElementById("dob").value;
-    var selectedPlace = JSON.parse($("#pob").attr("data-value"));
-    var tob = document.getElementById("tob").value;
+  var dob = document.getElementById("dob").value;
+  var selectedPlace = JSON.parse($("#pob").attr("data-value"));
+  var tob = document.getElementById("tob").value;
 
-    // Prepare the API request data
-    var requestData = {
-        ayanamsa: 1,
-        coordinates: selectedPlace.latitude + "," + selectedPlace.longitude,
-        datetime: dob + "T" + tob + ":00+05:30",
-        la: "en"
-    };
+  // Prepare the API request data
+  var requestData = {
+    ayanamsa: 1,
+    coordinates: selectedPlace.latitude + "," + selectedPlace.longitude,
+    datetime: dob + "T" + tob + ":00+05:30",
+    la: "en"
+  };
 
-    // Log the requestData object
-    console.log("Request Data:", requestData);
+  // Create a new iframe element
+  var iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
 
-    // Make the API request using jQuery
-    $.ajax({
-        url: "https://api.prokerala.com/v2/astrology/birth-details",
-        method: "POST",
-        headers: {
-            "Authorization": "Bearer " + "a1f574be-0a88-4f02-b28e-a5c888ebbb9a",
-            "X-Api-Key": "WFambIbA92FcEk5Rlq3to7LDlXPxMZNLgl5gXGuZ",
-            "Content-Type": "application/json"
-        },
-        data: JSON.stringify(requestData),
-        success: function(response) {
-            console.log("API Response:", response);
-            var nakshatra = response.nakshatra;
-            var rashi = response.rashi;
-            document.getElementById("nakshatra").value = nakshatra;
-            document.getElementById("rashi").value = rashi;
+  // Set up a message event listener
+  window.addEventListener('message', function(event) {
+    // Parse the response data
+    var response = JSON.parse(event.data);
 
-            // Trigger the dropdown change event to display the corresponding solution
-            var dropdown = document.getElementById("dropdown");
-            dropdown.value = nakshatra;
-            dropdown.dispatchEvent(new Event("change"));
+    if (response.error) {
+      console.error("Error:", response.error);
+      $("#apiStatus").text("Prokerala API: Failure");
+    } else {
+      console.log("API Response:", response);
+      var nakshatra = response.nakshatra;
+      var rashi = response.rashi;
+      document.getElementById("nakshatra").value = nakshatra;
+      document.getElementById("rashi").value = rashi;
 
-            $("#apiStatus").text("Prokerala API: Success");
-        },
-        error: function(xhr, status, error) {
-            console.error("Error:", error);
-            console.error("Status:", status);
-            console.error("Response:", xhr.responseText);
-            $("#apiStatus").text("Prokerala API: Failure");
-        }
-    });
+      // Trigger the dropdown change event to display the corresponding solution
+      var dropdown = document.getElementById("dropdown");
+      dropdown.value = nakshatra;
+      dropdown.dispatchEvent(new Event("change"));
+
+      $("#apiStatus").text("Prokerala API: Success");
+    }
+
+    // Remove the iframe
+    document.body.removeChild(iframe);
+  }, false);
+
+  // Set the iframe source to the proxy page with the request data as query parameters
+  iframe.src = 'proxy.html?data=' + encodeURIComponent(JSON.stringify(requestData));
 }
 
       $(document).ready(function() {
