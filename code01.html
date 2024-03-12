@@ -51,7 +51,7 @@
         font-size: 18px;
         padding: 20px;
         width: 100%;
-        height: 300px;
+        height: 200px;
         margin-top: 10px;
         resize: none;
       }
@@ -99,16 +99,17 @@
       #suggestions div:hover {
         background-color: #f2f2f2;
       }
-      @media (max-width: 600px) {
-        .container {
-          padding: 20px;
-        }
-        h1 {
-          font-size: 28px;
-        }
-        label, select, textarea {
-          font-size: 16px;
-        }
+      .input-group {
+        display: flex;
+        align-items: center;
+      }
+      .input-group input {
+        flex: 1;
+        margin-right: 10px;
+      }
+      #apiStatus {
+        margin-top: 20px;
+        font-weight: bold;
       }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -185,6 +186,9 @@
           });
 
           suggestions.show();
+          $("#apiStatus").text("OpenCage Geocoder API: Success");
+        }).fail(function() {
+          $("#apiStatus").text("OpenCage Geocoder API: Failure");
         });
       }
 
@@ -193,33 +197,17 @@
         var selectedPlace = JSON.parse($("#pob").attr("data-value"));
         var tob = document.getElementById("tob").value;
 
-        // Extract the day, month, and year from the date of birth
-        var dobParts = dob.split("-");
-        var day = dobParts[2];
-        var month = dobParts[1];
-        var year = dobParts[0];
-
-        // Extract the hour and minute from the time of birth
-        var tobParts = tob.split(":");
-        var hour = tobParts[0];
-        var min = tobParts[1];
-
         // Prepare the API request data
         var requestData = {
           ayanamsa: 1,
-          date: dob,
-          month: "",
-          year: "",
-          hour: "",
-          min: "",
-          lat: selectedPlace.latitude,
-          lon: selectedPlace.longitude,
-          tzone: 5.5
+          coordinates: selectedPlace.latitude + "," + selectedPlace.longitude,
+          datetime: dob + "T" + tob + ":00+05:30",
+          la: "en"
         };
 
         // Make the API request using jQuery
         $.ajax({
-          url: "https://api.prokerala.com/v2/astrology/nakshatra",
+          url: "https://api.prokerala.com/v2/astrology/birth-details",
           method: "POST",
           headers: {
             "Authorization": "Bearer " + "a1f574be-0a88-4f02-b28e-a5c888ebbb9a",
@@ -229,16 +217,23 @@
           data: JSON.stringify(requestData),
           success: function(response) {
             console.log("API Response:", response);
-            var nakshatra = response.data.nakshatra;
+            var nakshatra = response.nakshatra;
+            var rashi = response.rashi;
             document.getElementById("nakshatra").value = nakshatra;
+            document.getElementById("rashi").value = rashi;
 
             // Trigger the dropdown change event to display the corresponding solution
             var dropdown = document.getElementById("dropdown");
             dropdown.value = nakshatra;
             dropdown.dispatchEvent(new Event("change"));
+
+            $("#apiStatus").text("Prokerala API: Success");
           },
           error: function(xhr, status, error) {
             console.error("Error:", error);
+            console.error("Status:", status);
+            console.error("Response:", xhr.responseText);
+            $("#apiStatus").text("Prokerala API: Failure");
           }
         });
       }
@@ -254,6 +249,7 @@
         $("#suggestions").on("click", "div", function() {
           var selectedPlace = JSON.parse($(this).attr("data-value"));
           $("#pob").val(selectedPlace.name).attr("data-value", JSON.stringify(selectedPlace));
+          $("#latlong").text("Lat: " + selectedPlace.latitude + ", Long: " + selectedPlace.longitude);
           $("#suggestions").hide();
         });
       });
@@ -267,14 +263,16 @@
       <label for="tob">Time of Birth:</label>
       <input type="time" id="tob" name="tob" required>
       <label for="pob">Place of Birth:</label>
-      <div style="display: flex; align-items: center;">
-        <input type="text" id="pob" name="pob" autocomplete="off" required style="flex: 1;">
-        <span id="latlong" style="margin-left: 10px;"></span>
+      <div class="input-group">
+        <input type="text" id="pob" name="pob" autocomplete="off" required>
+        <span id="latlong"></span>
       </div>
       <div id="suggestions" style="display: none;"></div>
       <button onclick="generateNakshatra()">Generate Nakshatra</button>
       <label for="nakshatra">Generated Nakshatra:</label>
       <input type="text" id="nakshatra" name="nakshatra" readonly>
+      <label for="rashi">Rashi:</label>
+      <input type="text" id="rashi" name="rashi" readonly>
       <label for="dropdown">Select your Nakshatra:</label>
       <select id="dropdown" name="dropdown"></select>
       <label for="solution">Key traits of Nakshatra:</label>
@@ -285,88 +283,5 @@
       </p>
       <div id="apiStatus"></div>
     </div>
-    <script type="text/javascript">
-      // ... (existing JavaScript code) ...
-
-      function getPlaces(query) {
-        if (query.length < 3) return;
-
-        var url = "https://api.opencagedata.com/geocode/v1/json?q=" + encodeURIComponent(query) + "&key=2ab0c315e0c74bbb9e32684070bcfba9&limit=5";
-
-        $.getJSON(url, function(data) {
-          var suggestions = $("#suggestions");
-          suggestions.empty();
-
-          $.each(data.results, function(index, result) {
-            var option = $("<div>").text(result.formatted).attr("data-value", JSON.stringify({
-              name: result.formatted,
-              latitude: result.geometry.lat,
-              longitude: result.geometry.lng
-            }));
-            suggestions.append(option);
-          });
-
-          suggestions.show();
-          $("#apiStatus").text("OpenCage Geocoder API: Success");
-        }).fail(function() {
-          $("#apiStatus").text("OpenCage Geocoder API: Failure");
-        });
-      }
-
-      function generateNakshatra() {
-  var dob = document.getElementById("dob").value;
-  var selectedPlace = JSON.parse($("#pob").attr("data-value"));
-  var tob = document.getElementById("tob").value;
-
-  // Prepare the API request data
-  var requestData = {
-    ayanamsa: 1,
-    coordinates: selectedPlace.latitude + "," + selectedPlace.longitude,
-    datetime: dob + "T" + tob + ":00+05:30",
-    la: "en"
-  };
-
-  // Make the API request using jQuery
-  $.ajax({
-    url: "https://api.prokerala.com/v2/astrology/nakshatra",
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer " + "a1f574be-0a88-4f02-b28e-a5c888ebbb9a",
-      "X-Api-Key": "WFambIbA92FcEk5Rlq3to7LDlXPxMZNLgl5gXGuZ",
-      "Content-Type": "application/json"
-    },
-    data: JSON.stringify(requestData),
-    success: function(response) {
-      console.log("API Response:", response);
-      var nakshatra = response.data.nakshatra;
-      document.getElementById("nakshatra").value = nakshatra;
-
-      // Trigger the dropdown change event to display the corresponding solution
-      var dropdown = document.getElementById("dropdown");
-      dropdown.value = nakshatra;
-      dropdown.dispatchEvent(new Event("change"));
-
-      $("#apiStatus").text("Prokerala API: Success");
-    },
-    error: function(xhr, status, error) {
-      console.error("Error:", error);
-      console.error("Status:", status);
-      console.error("Response:", xhr.responseText);
-      $("#apiStatus").text("Prokerala API: Failure");
-    }
-  });
-}
-
-      $(document).ready(function() {
-        // ... (existing document ready code) ...
-
-        $("#suggestions").on("click", "div", function() {
-          var selectedPlace = JSON.parse($(this).attr("data-value"));
-          $("#pob").val(selectedPlace.name).attr("data-value", JSON.stringify(selectedPlace));
-          $("#latlong").text("Lat: " + selectedPlace.latitude + ", Long: " + selectedPlace.longitude);
-          $("#suggestions").hide();
-        });
-      });
-    </script>
   </body>
 </html>
