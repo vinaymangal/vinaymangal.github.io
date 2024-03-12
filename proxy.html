@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Proxy Page</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Extract the request data from the URL query parameters
+      var url = new URL(window.location.href);
+      var requestData = JSON.parse(url.searchParams.get('data'));
+
+      // Make the API request to the Prokerala API
+      $.ajax({
+        url: "https://api.prokerala.com/v2/astrology/birth-details",
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + "a1f574be-0a88-4f02-b28e-a5c888ebbb9a",
+          "X-Api-Key": "WFambIbA92FcEk5Rlq3to7LDlXPxMZNLgl5gXGuZ",
+          "Content-Type": "application/json"
+        },
+        data: JSON.stringify(requestData),
+        success: function(response) {
+          // Send the response back to the parent window
+          window.parent.postMessage(JSON.stringify(response), '*');
+        },
+        error: function(xhr, status, error) {
+          // Send the error response back to the parent window
+          window.parent.postMessage(JSON.stringify({ error: error }), '*');
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+</body>
+</html>
