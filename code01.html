@@ -206,66 +206,66 @@
     }
 
     function generateNakshatra() {
-  var dob = document.getElementById("dob").value;
-  var selectedPlace = JSON.parse($("#pob").attr("data-value"));
-  var tob = document.getElementById("tob").value;
+      var dob = document.getElementById("dob").value;
+      var selectedPlace = JSON.parse($("#pob").attr("data-value"));
+      var tob = document.getElementById("tob").value;
 
-  var dobParts = dob.split("-");
-  var day = parseInt(dobParts[2]);
-  var month = parseInt(dobParts[1]);
-  var year = parseInt(dobParts[0]);
+      var dobParts = dob.split("-");
+      var day = parseInt(dobParts[2]);
+      var month = parseInt(dobParts[1]);
+      var year = parseInt(dobParts[0]);
 
-  var tobParts = tob.split(":");
-  var hour = parseInt(tobParts[0]);
-  var min = parseInt(tobParts[1]);
+      var tobParts = tob.split(":");
+      var hour = parseInt(tobParts[0]);
+      var min = parseInt(tobParts[1]);
 
-  var userId = '628999';
-  var apiKey = 'aa050f26e826a0a9cc35e9d939dc4474';
+      var userId = '628999';
+      var apiKey = 'aa050f26e826a0a9cc35e9d939dc4474';
 
-  var data = {
-    day: day,
-    month: month,
-    year: year,
-    hour: hour,
-    min: min,
-    lat: selectedPlace.latitude,
-    lon: selectedPlace.longitude,
-    tzone: 5.5
-  };
+      var data = {
+        day: day,
+        month: month,
+        year: year,
+        hour: hour,
+        min: min,
+        lat: selectedPlace.latitude,
+        lon: selectedPlace.longitude,
+        tzone: 5.5
+      };
 
-  var auth = "Basic " + btoa(userId + ":" + apiKey);
+      var auth = "Basic " + btoa(userId + ":" + apiKey);
 
-  $.ajax({
-    url: "https://api.astrologyapi.com/v1/birth_details",
-    method: "POST",
-    dataType: 'json',
-    headers: {
-      "authorization": auth,
-      "Content-Type": 'application/json'
-    },
-    data: JSON.stringify(data),
-    success: function(response) {
-      console.log("API Response:", response);
-      var nakshatra = response.naksahtra;
-      var rashi = response.ascendant;
-      document.getElementById("nakshatra").value = nakshatra;
-      document.getElementById("rashi").value = rashi;
+      $.ajax({
+        url: "https://json.astrologyapi.com/v1/astro_details",
+        method: "POST",
+        dataType: 'json',
+        headers: {
+          "authorization": auth,
+          "Content-Type": 'application/json'
+        },
+        data: JSON.stringify(data),
+        success: function (response) {
+          console.log("API Response:", response);
+          var nakshatra = response.naksahtra_details.naksahtra;
+          var rashi = response.ascendant_details.ascendant;
+          document.getElementById("nakshatra").value = nakshatra;
+          document.getElementById("rashi").value = rashi;
 
-      // Trigger the dropdown change event to display the corresponding solution
-      var dropdown = document.getElementById("dropdown");
-      dropdown.value = nakshatra;
-      dropdown.dispatchEvent(new Event("change"));
+          // Trigger the dropdown change event to display the corresponding solution
+          var dropdown = document.getElementById("dropdown");
+          dropdown.value = nakshatra;
+          dropdown.dispatchEvent(new Event("change"));
 
-      $("#apiStatus").text("AstrologyAPI: Success");
-    },
-    error: function(xhr, status, error) {
-      console.error("Error:", error);
-      console.error("Status:", status);
-      console.error("Response:", xhr.responseText);
-      $("#apiStatus").text("AstrologyAPI: Failure");
+          $("#apiStatus").text("AstrologyAPI: Success");
+        },
+        error: function (xhr, status, error) {
+          console.error("Error:", error);
+          console.error("Status:", status);
+          console.error("Response:", xhr.responseText);
+          $("#apiStatus").text("AstrologyAPI: Failure");
+        }
+      });
     }
-  });
-}
 
     $(document).ready(function () {
       loadFile();
