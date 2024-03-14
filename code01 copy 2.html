@@ -193,65 +193,50 @@
       }
 
       function generateNakshatra() {
-  var dob = document.getElementById("dob").value;
-  var selectedPlace = JSON.parse($("#pob").attr("data-value"));
-  var tob = document.getElementById("tob").value;
+        var dob = document.getElementById("dob").value;
+        var selectedPlace = JSON.parse($("#pob").attr("data-value"));
+        var tob = document.getElementById("tob").value;
 
-  var dobParts = dob.split("-");
-  var day = parseInt(dobParts[2]);
-  var month = parseInt(dobParts[1]);
-  var year = parseInt(dobParts[0]);
+        // Prepare the API request data
+        var requestData = {
+          ayanamsa: 1,
+          coordinates: selectedPlace.latitude + "," + selectedPlace.longitude,
+          datetime: dob + "T" + tob + ":00+05:30",
+          la: "en"
+        };
 
-  var tobParts = tob.split(":");
-  var hour = parseInt(tobParts[0]);
-  var min = parseInt(tobParts[1]);
+        // Make the API request using the CORS Anywhere proxy
+        $.ajax({
+          url: "https://cors-anywhere.herokuapp.com/https://api.prokerala.com/v2/astrology/birth-details",
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + "a1f574be-0a88-4f02-b28e-a5c888ebbb9a",
+            "X-Api-Key": "WFambIbA92FcEk5Rlq3to7LDlXPxMZNLgl5gXGuZ",
+            "Content-Type": "application/json"
+          },
+          data: JSON.stringify(requestData),
+          success: function(response) {
+            console.log("API Response:", response);
+            var nakshatra = response.nakshatra;
+            var rashi = response.rashi;
+            document.getElementById("nakshatra").value = nakshatra;
+            document.getElementById("rashi").value = rashi;
 
-  var userId = '4545';
-  var apiKey = 'ByVOIaODH57QRVi6CqswHXGlcpDvj7tZBRoorY';
-  var data = {
-    day: day,
-    month: month,
-    year: year,
-    hour: hour,
-    min: min,
-    lat: selectedPlace.latitude,
-    lon: selectedPlace.longitude,
-    tzone: 5.5
-  };
+            // Trigger the dropdown change event to display the corresponding solution
+            var dropdown = document.getElementById("dropdown");
+            dropdown.value = nakshatra;
+            dropdown.dispatchEvent(new Event("change"));
 
-  var auth = "Basic " + btoa(userId + ":" + apiKey);
-
-  $.ajax({
-    url: "https://json.astrologyapi.com/v1/birth_details",
-    method: "POST",
-    dataType: 'json',
-    headers: {
-      "authorization": auth,
-      "Content-Type": 'application/json'
-    },
-    data: JSON.stringify(data),
-    success: function(response) {
-      console.log("API Response:", response);
-      var nakshatra = response.nakshatra;
-      var rashi = response.ascendant;
-      document.getElementById("nakshatra").value = nakshatra;
-      document.getElementById("rashi").value = rashi;
-
-      // Trigger the dropdown change event to display the corresponding solution
-      var dropdown = document.getElementById("dropdown");
-      dropdown.value = nakshatra;
-      dropdown.dispatchEvent(new Event("change"));
-
-      $("#apiStatus").text("Vedic Rishi API: Success");
-    },
-    error: function(xhr, status, error) {
-      console.error("Error:", error);
-      console.error("Status:", status);
-      console.error("Response:", xhr.responseText);
-      $("#apiStatus").text("Vedic Rishi API: Failure");
-    }
-  });
-}
+            $("#apiStatus").text("Prokerala API: Success");
+          },
+          error: function(xhr, status, error) {
+            console.error("Error:", error);
+            console.error("Status:", status);
+            console.error("Response:", xhr.responseText);
+            $("#apiStatus").text("Prokerala API: Failure");
+          }
+        });
+      }
 
       $(document).ready(function() {
         loadFile();
