@@ -5,46 +5,80 @@
   <title>Home - Website made by Vinay Mangal</title>
   <meta name="description" content="Welcome to my website! This site is a simple landing page with a link to my various websites." />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #ffffff;
+      font-family: "Roboto", sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      padding: 40px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+      font-size: 36px;
+      margin-bottom: 30px;
+    }
+    p {
+      color: #777;
+      font-size: 18px;
+      margin-bottom: 30px;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #4285f4;
+      color: #fff;
+      font-size: 18px;
+      padding: 12px 30px;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .btn:hover {
+      background-color: #3367d6;
+    }
+    .footer {
+      color: #777;
+      font-size: 14px;
+      margin-top: 30px;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      p {
+        font-size: 16px;
+      }
+      .btn {
+        font-size: 16px;
+        padding: 10px 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Vinay Mangal</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Contact</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-  </header>
-  <main class="container my-5">
-    <h1 class="text-center mb-4">Website made by Vinay Mangal<br>(with complete help from ChatGPT)</h1>
-    <p class="text-center mb-5">
+  <div class="container">
+    <h1>Website made by Vinay Mangal<br>(with complete help from ChatGPT)</h1>
+    <p>
       Welcome to my website! This site is a simple landing page with a link to my various websites. Click the button below to go there now.
     </p>
-    <div class="text-center">
-      <a href="astrology.html" class="btn btn-lg btn-success">1. Astrology Website</a>
-    </div>
-  </main>
-  <footer class="bg-light text-center py-3">
-    &copy; 2023 Vinay Mangal
-  </footer>
-  <!-- Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <a href="astrology.html" class="btn">Astrology Website</a>
+    <a href="code01.html" class="btn">experiment</a>
+    <p class="footer">
+      &copy; 2023 Vinay Mangal
+    </p>
+  </div>
 </body>
 </html>
