@@ -206,9 +206,8 @@
   var hour = parseInt(tobParts[0]);
   var min = parseInt(tobParts[1]);
 
-  var userId = '628999'; // Replace with your actual user ID
-  var apiKey = 'aa050f26e826a0a9cc35e9d939dc4474'; // Replace with your actual API key
-
+  var userId = '628999';
+  var apiKey = 'aa050f26e826a0a9cc35e9d939dc4474';
   var data = {
     day: day,
     month: month,
@@ -217,13 +216,13 @@
     min: min,
     lat: selectedPlace.latitude,
     lon: selectedPlace.longitude,
-    tzone: 5.5 // Replace with the correct timezone value if needed
+    tzone: 5.5
   };
 
   var auth = "Basic " + btoa(userId + ":" + apiKey);
 
   $.ajax({
-    url: "https://api.astrologyapi.com/v1/nakshatra",
+    url: "https://json.astrologyapi.com/v1/birth_details",
     method: "POST",
     dataType: 'json',
     headers: {
@@ -233,8 +232,8 @@
     data: JSON.stringify(data),
     success: function(response) {
       console.log("API Response:", response);
-      var nakshatra = response.nakshatra; // Ensure the response structure has 'nakshatra'
-      var rashi = response.rashi; // Ensure the response structure has 'rashi'
+      var nakshatra = response.nakshatra;
+      var rashi = response.ascendant;
       document.getElementById("nakshatra").value = nakshatra;
       document.getElementById("rashi").value = rashi;
 
@@ -243,13 +242,13 @@
       dropdown.value = nakshatra;
       dropdown.dispatchEvent(new Event("change"));
 
-      $("#apiStatus").text("AstrologyAPI: Success");
+      $("#apiStatus").text("Vedic Rishi API: Success");
     },
     error: function(xhr, status, error) {
       console.error("Error:", error);
       console.error("Status:", status);
       console.error("Response:", xhr.responseText);
-      $("#apiStatus").text("AstrologyAPI: Failure");
+      $("#apiStatus").text("Vedic Rishi API: Failure");
     }
   });
 }
