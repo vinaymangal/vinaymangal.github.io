@@ -223,13 +223,14 @@
   var auth = "Basic " + btoa(userId + ":" + apiKey);
 
   $.ajax({
-    url: "https://api.astrologyapi.com/v1/birth_details",
+    url: "https://json.astrologyapi.com/v1/general_nakshatra_report",
     method: "POST",
     dataType: 'json',
     headers: {
       "authorization": auth,
       "Content-Type": 'application/json'
     },
+
     data: JSON.stringify(data),
     success: function(response) {
       console.log("API Response:", response);
