@@ -246,8 +246,8 @@
         data: JSON.stringify(data),
         success: function (response) {
           console.log("API Response:", response);
-          var nakshatra = response.naksahtra_details.naksahtra;
-          var rashi = response.ascendant_details.ascendant;
+          var nakshatra = response.Naksahtra;
+          var rashi = response.sign;
           document.getElementById("nakshatra").value = nakshatra;
           document.getElementById("rashi").value = rashi;
 
